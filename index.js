@@ -27,7 +27,7 @@ const times = [
 let chan;
 
 client.on("ready", () => {
-  console.log(`Logged in as ${client.user?.tag}!`);
+    console.log(`Logged in as ${client.user?.tag}!`);
 
     // load the channel
     chan = client.channels.cache.get(channel);
