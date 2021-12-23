@@ -1,5 +1,5 @@
 const { Client, Intents } = require("discord.js");
-const { token, channel, emote } = require("./config.json");
+const { token, channel, sadEmote, happyEmote } = require("./config.json");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
@@ -43,7 +43,7 @@ client.on("interactionCreate", async interaction => {
     const { commandName } = interaction;
 
     if (commandName === "sad") {
-        await interaction.reply(emote);
+        await interaction.reply(sadEmote);
     }
 });
 
@@ -58,10 +58,10 @@ client.on("messageCreate", ctx => {
     console.log(rnd);
 
     if (rnd < 0.01) {
-        ctx.channel.send(emote);
+        ctx.channel.send(sadEmote);
     }  else if (rnd < 0.011) {
-		ctx.channel.send("<:pepohappy:923565156217274409>");
-	}
+        ctx.channel.send(happyEmote);
+    }
 });
 
 const checkTime = () => {
@@ -82,7 +82,7 @@ const checkTime = () => {
 
         if (parseFloat(nowtime) === parseFloat(classtime)) {
             console.log("peposad");
-            chan.send(emote);
+            chan.send(sadEmote);
         }
     }
 };
