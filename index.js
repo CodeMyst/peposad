@@ -44,6 +44,8 @@ client.on("interactionCreate", async interaction => {
 
     if (commandName === "sad") {
         await interaction.reply(sadEmote);
+    } else if (commandName === "happy") {
+        await interaction.reply(happyEmote);
     }
 });
 
