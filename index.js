@@ -6,7 +6,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 // list of times when the bot should send the emote
 const times = [
     [1, 12.00],
-    [1, 14.00],
+    [1, 14.30],
     [1, 17.00],
 
     [2,  9.00],
