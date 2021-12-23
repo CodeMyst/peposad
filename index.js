@@ -60,7 +60,7 @@ client.on("messageCreate", ctx => {
     if (rnd < 0.01) {
         ctx.channel.send(emote);
     }  else if (rnd < 0.011) {
-		ctx.channel.send("<:pepohappy:921130790933393450>");
+		ctx.channel.send("<:pepohappy:923565156217274409>");
 	}
 });
 
