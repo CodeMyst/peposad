@@ -33,7 +33,8 @@ client.on("ready", () => {
     chan = client.channels.cache.get(channel);
 
     // check the times every 45secs
-    setInterval(checkTime, 45 * 1000);
+    // disabled, no classes right now
+    // setInterval(checkTime, 45 * 1000);
 });
 
 client.on("interactionCreate", async interaction => {
