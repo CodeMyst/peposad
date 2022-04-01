@@ -5,22 +5,33 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 
 // list of times when the bot should send the emote
 const times = [
-    [1, 12.00],
-    [1, 14.30],
-    [1, 17.00],
+    [1, 9.00],
+    [1, 14.00],
 
     [2,  9.00],
-    [2, 11.00],
-    [2, 12.45],
+    [2, 12.00],
 
-    [3,  9.00],
-    [3, 15.00],
+    [3,  15.31],
 
-    [4, 12.00],
-    [4, 13.30],
+    [4, 14.15],
+    [4, 16.00],
 
-    [5, 10.45],
-    [5, 11.00]
+    [5, 15.00]
+];
+
+const classes = [
+    "OS2 - P",
+    "RM - P",
+
+    "PRIS - P",
+    "NWP - PV",
+    
+    "NWP - P",
+    
+    "OR - P",
+    "OS2 - PV",
+
+    "OR - PV"
 ];
 
 // channel where the bot sends the emotes
@@ -33,8 +44,7 @@ client.on("ready", () => {
     chan = client.channels.cache.get(channel);
 
     // check the times every 45secs
-    // disabled, no classes right now
-    // setInterval(checkTime, 45 * 1000);
+    setInterval(checkTime, 45 * 1000);
 });
 
 client.on("interactionCreate", async interaction => {
@@ -71,7 +81,7 @@ const checkTime = () => {
     const now = new Date();
     // +1 to convert from UTC to CET
     // TODO: convert to CET/CEST (daylight savings)
-    const nowtime = (now.getUTCHours()+1) + "." + now.getUTCMinutes();
+    const nowtime = (now.getUTCHours()+2) + "." + now.getUTCMinutes();
     console.log("now: " + parseFloat(nowtime));
 
     for (let i = 0; i < times.length; i++) {
@@ -83,9 +93,11 @@ const checkTime = () => {
 
         console.log("class check: " + parseFloat(classtime));
 
+        const subject = classes[i];
+
         if (parseFloat(nowtime) === parseFloat(classtime)) {
             console.log("peposad");
-            chan.send(sadEmote);
+            chan.send(sadEmote + "  " + subject);
         }
     }
 };
