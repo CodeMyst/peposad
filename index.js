@@ -25,9 +25,9 @@ const classes = [
 
     "PRIS - P",
     "NWP - PV",
-    
+
     "NWP - P",
-    
+
     "OR - P",
     "OS2 - PV",
 
@@ -44,7 +44,7 @@ client.on("ready", () => {
     chan = client.channels.cache.get(channel);
 
     // check the times every 45secs
-    setInterval(checkTime, 45 * 1000);
+    // setInterval(checkTime, 45 * 1000);
 });
 
 client.on("interactionCreate", async interaction => {
