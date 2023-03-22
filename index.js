@@ -64,6 +64,10 @@ client.on("messageCreate", ctx => {
     // ignore bot messages
     if (ctx.author.bot) return;
 
+    if (ctx.content.toLowerCase().includes("kako")) {
+        ctx.channel.send("kako?");
+    }
+
     // random chance to send the emote on every message
 
     const rnd = Math.random();
