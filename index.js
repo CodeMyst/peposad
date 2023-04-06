@@ -9,7 +9,7 @@ const insults = readFileSync("insults.txt").toString().split("\n");
 client.on("ready", () => {
     console.log(`Logged in as ${client.user?.tag}!`);
 
-    setInterval(randomlyInsult, 5 * 1000);
+    setInterval(randomlyInsult, 60 * 1000);
 });
 
 client.on("interactionCreate", async interaction => {
