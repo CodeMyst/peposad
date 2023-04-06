@@ -29,8 +29,9 @@
     "id": "discord application id",
     "token": "discord bot token",
     "server": "server id (right click server -> copy id)",
-    "channel": "channel id (right click channel -> copy id)",
-    "emote": "emote, send the emote with a backslash: \:peposad: and copy that here"
+    "generalChannel": "channel id (right click channel -> copy id)",
+    "happyEmote": "emote, send the emote with a backslash: \:peposad: and copy that here"
+    "sadEmote": "..."
 }
 ```
 

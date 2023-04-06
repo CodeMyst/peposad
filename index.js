@@ -1,50 +1,15 @@
-const { Client, Intents } = require("discord.js");
-const { token, channel, sadEmote, happyEmote } = require("./config.json");
+import { Client, Intents } from "discord.js";
+import config from "./config.json" assert { type: "json" };
+import { readFileSync } from "fs";
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS] });
 
-// list of times when the bot should send the emote
-const times = [
-    [1, 9.00],
-    [1, 14.00],
-
-    [2,  9.00],
-    [2, 12.00],
-
-    [3,  12.00],
-
-    [4, 14.15],
-    [4, 16.00],
-
-    [5, 15.00]
-];
-
-const classes = [
-    "OS2 - P",
-    "RM - P",
-
-    "PRIS - P",
-    "NWP - PV",
-
-    "NWP - P",
-
-    "OR - P",
-    "OS2 - PV",
-
-    "OR - PV"
-];
-
-// channel where the bot sends the emotes
-let chan;
+const insults = readFileSync("insults.txt").toString().split("\n");
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user?.tag}!`);
 
-    // load the channel
-    chan = client.channels.cache.get(channel);
-
-    // check the times every 45secs
-    // setInterval(checkTime, 45 * 1000);
+    setInterval(randomlyInsult, 5 * 1000);
 });
 
 client.on("interactionCreate", async interaction => {
@@ -54,9 +19,9 @@ client.on("interactionCreate", async interaction => {
     const { commandName } = interaction;
 
     if (commandName === "sad") {
-        await interaction.reply(sadEmote);
+        await interaction.reply(config.sadEmote);
     } else if (commandName === "happy") {
-        await interaction.reply(happyEmote);
+        await interaction.reply(config.happyEmote);
     }
 });
 
@@ -69,41 +34,28 @@ client.on("messageCreate", ctx => {
     }
 
     // random chance to send the emote on every message
-
     const rnd = Math.random();
 
-    console.log(rnd);
-
     if (rnd < 0.01) {
-        ctx.channel.send(sadEmote);
-    }  else if (rnd < 0.011) {
-        ctx.channel.send(happyEmote);
+        ctx.channel.send(config.sadEmote);
+    } else if (rnd < 0.011) {
+        ctx.channel.send(config.happyEmote);
     }
 });
 
-const checkTime = () => {
-    const now = new Date();
-    // +1 to convert from UTC to CET
-    // TODO: convert to CET/CEST (daylight savings)
-    const nowtime = (now.getUTCHours()+2) + "." + now.getUTCMinutes();
-    console.log("now: " + parseFloat(nowtime));
+const randomlyInsult = async () => {
+    let channel = client.channels.cache.get(config.generalChannel);
 
-    for (let i = 0; i < times.length; i++) {
-        const time = times[i];
-        const day = time[0];
-        const classtime = time[1];
+    // random chance to insult
+    const rnd = Math.random();
 
-        if (day !== now.getDay()) continue;
+    if (rnd < 0.01) {
+        await channel.guild.members.fetch();
+        const randomUser = channel.guild.members.cache.random().user;
+        const randomInsult = insults[Math.floor(Math.random() * insults.length)];
 
-        console.log("class check: " + parseFloat(classtime));
-
-        const subject = classes[i];
-
-        if (parseFloat(nowtime) === parseFloat(classtime)) {
-            console.log("peposad");
-            chan.send(sadEmote + "  " + subject);
-        }
+        channel.send(`${randomUser} is a ${randomInsult} ${config.laughEmote}`);
     }
 };
 
-client.login(token);
+client.login(config.token);
