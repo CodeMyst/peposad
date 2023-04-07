@@ -6,10 +6,12 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 
 const insults = readFileSync("insults.txt").toString().split("\n");
 
+let timeSinceLastInsult;
+
 client.on("ready", () => {
     console.log(`Logged in as ${client.user?.tag}!`);
 
-    setInterval(randomlyInsult, 60 * 1000);
+    setInterval(randomlyInsult, 5 * 60 * 1000);
 });
 
 client.on("interactionCreate", async interaction => {
@@ -44,17 +46,25 @@ client.on("messageCreate", ctx => {
 });
 
 const randomlyInsult = async () => {
+    if (timeSinceLastInsult) {
+        const diff = Math.abs(new Date() - timeSinceLastInsult);
+
+        if (diff <= 2 * 60 * 60 * 1000) return;
+    }
+
     let channel = client.channels.cache.get(config.generalChannel);
 
     // random chance to insult
     const rnd = Math.random();
 
-    if (rnd < 0.01) {
+    if (rnd < 0.005) {
         await channel.guild.members.fetch();
         const randomUser = channel.guild.members.cache.random().user;
         const randomInsult = insults[Math.floor(Math.random() * insults.length)];
 
         channel.send(`${randomUser} is a ${randomInsult} ${config.laughEmote}`);
+
+        timeSinceLastInsult = new Date();
     }
 };
 
