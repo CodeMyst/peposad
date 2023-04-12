@@ -49,7 +49,7 @@ const randomlyInsult = async () => {
     if (timeSinceLastInsult) {
         const diff = Math.abs(new Date() - timeSinceLastInsult);
 
-        if (diff <= 2 * 60 * 60 * 1000) return;
+        if (diff <= 24 * 60 * 60 * 1000) return;
     }
 
     let channel = client.channels.cache.get(config.generalChannel);
