@@ -81,7 +81,7 @@ const randomInsult = async () => {
     await channel.guild.members.fetch();
     const randomUser = channel.guild.members.cache.random().user;
     const rnd = Math.random();
-    const randomInsult = insults[Math.floor(rnd * insults.length)];
+    const randomInsult = insults[Math.floor(rnd * (insults.length - 1))];
 
     channel.send(`${randomUser} is a ${randomInsult} ${config.laughEmote}`);
 };
@@ -91,7 +91,7 @@ const randomGame = () => {
     let voiceChannel = client.channels.cache.get(config.voiceChannel);
 
     const rnd = Math.random();
-    const randomGame = games[Math.floor(rnd * games.length)];
+    const randomGame = games[Math.floor(rnd * (games.length - 1))];
 
     channel.send(`oće neko ${randomGame}?`);
 
