@@ -1,7 +1,7 @@
 import { Client, Intents } from "discord.js";
 import { joinVoiceChannel } from "@discordjs/voice";
 import config from "./config.json" assert { type: "json" };
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS] });
 
@@ -49,6 +49,20 @@ client.on("messageCreate", ctx => {
     } else if (rnd < 0.011) {
         ctx.channel.send(config.happyEmote);
     }
+
+    if (ctx.mentions.has(client.user)) {
+        const regex = /@(.*) oces (\w*)/.exec(ctx.content);
+
+        if (regex) {
+            const game = regex[2];
+            ctx.channel.send(`ajmo ${game}`);
+
+            joinVoiceTemp();
+
+            if (!games.includes(game)) games.push(game);
+            saveGames();
+        }
+    }
 });
 
 const randomMessage = async () => {
@@ -88,12 +102,17 @@ const randomInsult = async () => {
 
 const randomGame = () => {
     let channel = client.channels.cache.get(config.generalChannel);
-    let voiceChannel = client.channels.cache.get(config.voiceChannel);
 
     const rnd = Math.random();
     const randomGame = games[Math.floor(rnd * (games.length - 1))];
 
+    joinVoiceTemp();
+
     channel.send(`oće neko ${randomGame}?`);
+};
+
+const joinVoiceTemp = () => {
+    let voiceChannel = client.channels.cache.get(config.voiceChannel);
 
     voiceConnection = joinVoiceChannel({
         channelId: voiceChannel.id,
@@ -106,6 +125,11 @@ const randomGame = () => {
     setTimeout(() => {
         voiceConnection.destroy();
     }, 30 * 60 * 1000);
+};
+
+const saveGames = () => {
+    const gamesText = games.filter(g => g !== "").join("\n");
+    writeFileSync("games.txt", gamesText);
 };
 
 client.login(config.token);
