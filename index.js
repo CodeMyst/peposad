@@ -51,7 +51,7 @@ client.on("messageCreate", ctx => {
     }
 
     if (ctx.mentions.has(client.user)) {
-        const regex = /@(.*) oces (\w*)/.exec(ctx.content);
+        const regex = /@(.*) oces ([a-zA-Z0-9_ ]*)/.exec(ctx.content);
 
         if (regex) {
             const game = regex[2];
