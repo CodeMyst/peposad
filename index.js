@@ -37,8 +37,12 @@ client.on("messageCreate", ctx => {
     // ignore bot messages
     if (ctx.author.bot) return;
 
-    if (ctx.content.toLowerCase().includes("kako")) {
+    const content = ctx.content.toLowerCase();
+
+    if (content.includes("kako") || content.includes("kak0")) {
         ctx.channel.send("kako?");
+    } else if (content.includes("gde")) {
+        ctx.channel.send("gde?");
     }
 
     // random chance to send the emote on every message
