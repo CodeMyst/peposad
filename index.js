@@ -8,6 +8,8 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 const insults = readFileSync("insults.txt").toString().split("\n");
 const games = readFileSync("games.txt").toString().split("\n");
 
+const EMOJI_REGEX = /((?<!\\)<:[^:]+:(\d+)>)|\p{Emoji_Presentation}|\p{Extended_Pictographic}/gmu;
+
 let voiceConnection;
 
 let timeSinceLastMessage;
@@ -38,6 +40,11 @@ client.on("messageCreate", ctx => {
     if (ctx.author.bot) return;
 
     const content = ctx.content.toLowerCase();
+
+    const emotes = content.match(EMOJI_REGEX);
+    if (emotes && emotes.length > 0) {
+        ctx.react(emotes[0]);
+    }
 
     if (content.includes("kako") || content.includes("kak0")) {
         ctx.channel.send("kako?");
