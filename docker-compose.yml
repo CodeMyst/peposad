@@ -4,8 +4,6 @@ services:
     build:
       context: ./
     restart: unless-stopped
-    env_file:
-      .env
     volumes:
       - ./games.txt:/usr/src/app/games.txt
       - ./insults.txt:/usr/src/app/insults.txt
