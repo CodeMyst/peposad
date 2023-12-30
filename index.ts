@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, Message, type GuildBasedChannel, , type GuildTextBasedChannel } from "discord.js";
+import { Client, Events, GatewayIntentBits, Message, type GuildBasedChannel, type GuildTextBasedChannel } from "discord.js";
 import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
 
 const { TOKEN, SERVER_ID, SAD_EMOTE, HAPPY_EMOTE, LAUGH_EMOTE, VOICE_CHANNEL, TEXT_CHANNEL } = process.env;
