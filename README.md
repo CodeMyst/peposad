@@ -2,9 +2,8 @@
 
 ## setup
 
-* install nodejs
-* install npm
-* run `npm i`
+* install bun
+* run `bun i`
 
 ## create bot application
 
@@ -20,27 +19,27 @@
 * permissions: read messages/view channels, send messages, use slash commands
 * copy the url and open in the browser
 
-## create config.json
+## create .env.local
 
-* create config.json
+* create .env.local
 
-```json
-{
-    "id": "discord application id",
-    "token": "discord bot token",
-    "server": "server id (right click server -> copy id)",
-    "generalChannel": "channel id (right click channel -> copy id)",
-    "happyEmote": "emote, send the emote with a backslash: \:peposad: and copy that here"
-    "sadEmote": "..."
-}
+```env
+TOKEN=discord bot token
+APP_ID=discord application id
+SERVER_ID=server id (right click server -> copy id)
+SAD_EMOTE=emote, send the emote with a backslash: \:peposad: and copy that here
+HAPPY_EMOTE=...
+LAUGH_EMOTE=...
+TEXT_CHANNEL=channel id (right click channel -> copy id)
+VOICE_CHANNEL=...
 ```
 
-## deploy commands
+## register commands
 
 * this needs to be done only once per server or when the commands change (i think)
-* run `npm run deploy_commands`
+* run `bun run register_commands.ts`
 * commands should now be available in the server (you might need to wait for a bit)
 
 ## run the bot
 
-* run `npm run start`
+* run `bun run index.ts`
