@@ -5,5 +5,4 @@ services:
       context: ./
     restart: unless-stopped
     volumes:
-      - ./games.txt:/usr/src/app/games.txt
-      - ./insults.txt:/usr/src/app/insults.txt
+      - .:/usr/src/app/
