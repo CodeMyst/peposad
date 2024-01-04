@@ -28,7 +28,7 @@ let voiceChannel: GuildBasedChannel | undefined;
 let timeSinceLastRandomMessage: Date | undefined;
 
 const db = await open({
-    filename: 'database.db',
+    filename: './db/database.db',
     driver: sqlite3.Database
 });
 

@@ -5,4 +5,16 @@ services:
       context: ./
     restart: unless-stopped
     volumes:
-      - .:/usr/src/app/
+      - sqlite-db:/app/db/
+    environment:
+      - TOKEN=${TOKEN}
+      - APP_ID=${APP_ID}
+      - SERVER_ID=${SERVER_ID}
+      - SAD_EMOTE=${SAD_EMOTE}
+      - HAPPY_EMOTE=${HAPPY_EMOTE}
+      - LAUGH_EMOTE=${LAUGH_EMOTE}
+      - TEXT_CHANNEL=${TEXT_CHANNEL}
+      - VOICE_CHANNEL=${VOICE_CHANNEL}
+
+volumes:
+  sqlite-db:
