@@ -1,5 +1,7 @@
 import { Client, Events, GatewayIntentBits, Message, type GuildBasedChannel, type GuildTextBasedChannel } from "discord.js";
 import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
+import sqlite3 from 'sqlite3';
+import { open } from "sqlite";
 
 const { TOKEN, SERVER_ID, SAD_EMOTE, HAPPY_EMOTE, LAUGH_EMOTE, VOICE_CHANNEL, TEXT_CHANNEL } = process.env;
 
@@ -17,9 +19,6 @@ const client = new Client(
 const INSULTS_FILE = Bun.file('./insults.txt');
 const GAMES_FILE = Bun.file('./games.txt');
 
-const INSULTS = (await INSULTS_FILE.text()).split('\n');
-const GAMES = (await GAMES_FILE.text()).split('\n');
-
 const GAME_REGEX = /@(.*) ajmo ([a-zA-Z0-9_ ]*)/;
 const EMOJI_REGEX = /((?<!\\)<:[^:]+:(\d+)>)|\p{Emoji_Presentation}|\p{Extended_Pictographic}/gmu;
 
@@ -28,7 +27,37 @@ let voiceChannel: GuildBasedChannel | undefined;
 
 let timeSinceLastRandomMessage: Date | undefined;
 
-client.once(Events.ClientReady, (c) => {
+const db = await open({
+    filename: 'database.db',
+    driver: sqlite3.Database
+});
+
+const seedDb = async () => {
+    await db.exec('create table if not exists games (game TEXT not null unique)');
+    await db.exec('create table if not exists insults (insult TEXT not null unique)');
+
+    const games = (await GAMES_FILE.text()).split('\n').filter(i => i !== '');
+    const insults = (await INSULTS_FILE.text()).split('\n').filter(g => g !== '');
+
+    const gameCount = await db.get('select count(*) from games');
+
+    if (gameCount && gameCount['count(*)'] !== 0) return;
+
+    const gamesStmt = await db.prepare('insert or ignore into games (game) values (?)');
+    const insultsStmt = await db.prepare('insert or ignore into insults (insult) values (?)');
+
+    games.forEach(async g => {
+        await gamesStmt.run(g);
+    });
+
+    insults.forEach(async i => {
+        await insultsStmt.run(i);
+    });
+};
+
+await seedDb();
+
+client.once(Events.ClientReady, async (c) => {
     console.log(`Logged in as ${c.user.tag}!`);
 
     const guild = client.guilds.cache.get(SERVER_ID!);
@@ -39,7 +68,7 @@ client.once(Events.ClientReady, (c) => {
 
     setInterval(sendRandomMessage, 5 * 60 * 1000);
 
-    startRandomGame();
+    await startRandomGame();
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -52,7 +81,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
-client.on(Events.MessageCreate, (message) => {
+client.on(Events.MessageCreate, async (message) => {
     if (message.author.bot) return;
 
     const content = message.content.toLowerCase();
@@ -82,11 +111,11 @@ client.on(Events.MessageCreate, (message) => {
 
     // handle starting and registering new games
     if (message.mentions.has(client.user!)) {
-        startNewGame(message, content);
+        await startNewGame(message, content);
     }
 });
 
-const startNewGame = (message: Message<boolean>, content: string) => {
+const startNewGame = async (message: Message<boolean>, content: string) => {
     const match = GAME_REGEX.exec(content);
 
     if (!match) return;
@@ -96,9 +125,7 @@ const startNewGame = (message: Message<boolean>, content: string) => {
     message.reply(`ajmo ${game}`);
     joinVoice();
 
-    if (!GAMES.includes(game)) {
-        addNewGame(game);
-    }
+    await addNewGame(game);
 };
 
 const sendRandomMessage = async () => {
@@ -110,7 +137,7 @@ const sendRandomMessage = async () => {
 
     if (Math.random() < 0.005) {
         if (Math.random() < 0.5) {
-            startRandomGame();
+            await startRandomGame();
         } else {
             await randomInsult();
         }
@@ -119,9 +146,8 @@ const sendRandomMessage = async () => {
     }
 };
 
-const startRandomGame = () => {
-    const rnd = Math.random();
-    const randomGame = GAMES[Math.floor(rnd * (GAMES.length - 1))];
+const startRandomGame = async () => {
+    const randomGame = (await db.get('select game from games order by random() limit 1'))['game'];
 
     textChannel?.send(`oće neko ${randomGame}?`);
 
@@ -136,17 +162,13 @@ const randomInsult = async () => {
     const randomUser = textChannel.guild.members.cache.random()?.user;
     if (!randomUser) return;
 
-    const rnd = Math.random();
-    const randomInsult = INSULTS[Math.floor(rnd * (INSULTS.length - 1))];
+    const randomInsult = (await db.get('select insult from insults order by random() limit 1'))['insult'];
 
     textChannel.send(`${randomUser} is a ${randomInsult} ${LAUGH_EMOTE}`);
 };
 
-const addNewGame = (game: string) => {
-    GAMES.push(game);
-    const gamesText = GAMES.filter(g => g !== '').join('\n');
-
-    Bun.write(GAMES_FILE, gamesText);
+const addNewGame = async (game: string) => {
+    await db.run('insert or ignore into games (game) values (?)', game);
 };
 
 const joinVoice = () => {
