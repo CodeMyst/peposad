@@ -3,6 +3,7 @@ import { REST, Routes, SlashCommandBuilder } from "discord.js";
 const COMMANDS = [
     new SlashCommandBuilder().setName('sad').setDescription('sad'),
     new SlashCommandBuilder().setName('happy').setDescription('happy'),
+    new SlashCommandBuilder().setName('pray').setDescription('pray'),
 ].map(c => c.toJSON());
 
 const rest = new REST().setToken(process.env.TOKEN!);

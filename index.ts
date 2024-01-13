@@ -3,7 +3,7 @@ import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
 import sqlite3 from 'sqlite3';
 import { open } from "sqlite";
 
-const { TOKEN, SERVER_ID, SAD_EMOTE, HAPPY_EMOTE, LAUGH_EMOTE, VOICE_CHANNEL, TEXT_CHANNEL } = process.env;
+const { TOKEN, SERVER_ID, SAD_EMOTE, HAPPY_EMOTE, LAUGH_EMOTE, PRAY_EMOTE, VOICE_CHANNEL, TEXT_CHANNEL } = process.env;
 
 const client = new Client(
    {
@@ -78,6 +78,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await interaction.reply(SAD_EMOTE!);
     } else if (interaction.commandName === 'happy') {
         await interaction.reply(HAPPY_EMOTE!);
+    } else if (interaction.commandName === 'pray') {
+        const verse = await getRandomBibleVerse();
+        await interaction.reply(`${verse.reference}\n\n${verse.text}\n${PRAY_EMOTE}`);
     }
 });
 
@@ -136,10 +139,12 @@ const sendRandomMessage = async () => {
     }
 
     if (Math.random() < 0.005) {
-        if (Math.random() < 0.5) {
-            await startRandomGame();
-        } else {
-            await randomInsult();
+        const rnd = Math.floor(Math.random() * 3);
+
+        switch (rnd) {
+            case 1: await startRandomGame(); break;
+            case 2: await randomInsult(); break;
+            case 3: await sendRandomBibleVerse(); break;
         }
 
         timeSinceLastRandomMessage = new Date();
@@ -186,6 +191,30 @@ const joinVoice = () => {
         const connection = getVoiceConnection(SERVER_ID!);
         connection?.destroy();
     }, 30 * 60 * 1000);
+};
+
+interface BibleVerse {
+    reference: string;
+    text: string;
+}
+
+const sendRandomBibleVerse = async () => {
+    const verse = await getRandomBibleVerse();
+
+    textChannel?.send(`${verse.reference}\n\n${verse.text}\n${PRAY_EMOTE}`);
+};
+
+const getRandomBibleVerse = async (): Promise<BibleVerse> => {
+    const res = await fetch('https://bible-api.com/?random=verse');
+
+    if (!res.ok) {
+        return {
+            reference: 'peposad 42:69',
+            text: `In the swampy sanctum of peposad's server, let the ribbits of joy be your notification melody, and the leap of laughter your signature move. When faced with the glitches of life, may you find solace in the algorithm of amphibian absurdity. For in the pixelated pond of chat commands, the croak of camaraderie shall echo, and the lily pad of humor will be your sacred emoji. Hop into each day with a leap of faith, for FrogBot's blessings are as endless as the flies in the digital swamp!`
+        };
+    }
+
+    return await res.json() as BibleVerse;
 };
 
 client.login(TOKEN);
