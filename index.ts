@@ -102,6 +102,8 @@ client.on(Events.MessageCreate, async (message) => {
         message.reply('gde?');
     } else if (content.includes('koliko')) {
         message.reply('koliko?');
+    } else if (content.includes('ako')) {
+        message.reply('**AKO**');
     }
 
     // random chance to reply with a sad/happy emote
