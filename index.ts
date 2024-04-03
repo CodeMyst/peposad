@@ -3,7 +3,7 @@ import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
 import sqlite3 from 'sqlite3';
 import { open } from "sqlite";
 
-const { TOKEN, SERVER_ID, SAD_EMOTE, HAPPY_EMOTE, LAUGH_EMOTE, PRAY_EMOTE, VOICE_CHANNEL, TEXT_CHANNEL } = process.env;
+const { TOKEN, SERVER_ID, SAD_EMOTE, HAPPY_EMOTE, LAUGH_EMOTE, PRAY_EMOTE, VOICE_CHANNEL, TEXT_CHANNEL, POPE_USER_ID } = process.env;
 
 const client = new Client(
    {
@@ -26,6 +26,8 @@ let textChannel: GuildTextBasedChannel | undefined;
 let voiceChannel: GuildBasedChannel | undefined;
 
 let timeSinceLastRandomMessage: Date | undefined;
+
+let timeSinceLastPopePray: Date | undefined;
 
 const db = await open({
     filename: './db/database.db',
@@ -67,6 +69,7 @@ client.once(Events.ClientReady, async (c) => {
     voiceChannel = guild.channels.cache.get(VOICE_CHANNEL!);
 
     setInterval(sendRandomMessage, 5 * 60 * 1000);
+    setInterval(checkIfPopePrayed, 5 * 60 * 1000);
 
     await startRandomGame();
 });
@@ -81,6 +84,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } else if (interaction.commandName === 'pray') {
         const verse = await getRandomBibleVerse();
         await interaction.reply(`${verse.reference}\n\n${verse.text}\n${PRAY_EMOTE}`);
+
+        if (interaction.user.id === POPE_USER_ID) {
+            timeSinceLastPopePray = new Date();
+        }
     }
 });
 
@@ -92,7 +99,9 @@ client.on(Events.MessageCreate, async (message) => {
     // if the message contains an emote, react with it
     const emotes = content.match(EMOJI_REGEX);
     if (emotes) {
-        message.react(emotes[0]);
+        try {
+            await message.react(emotes[0]);
+        } catch {}
     }
 
     // kako?
@@ -150,6 +159,16 @@ const sendRandomMessage = async () => {
         }
 
         timeSinceLastRandomMessage = new Date();
+    }
+};
+
+const checkIfPopePrayed = async () => {
+    if (timeSinceLastPopePray) {
+        const diff = Math.abs(new Date().getTime() - timeSinceLastPopePray.getTime());
+
+        if (diff <= 35 * 60 * 60 * 1000) return;
+
+        await textChannel?.send(`alo <@${POPE_USER_ID}> nisi se molio čitav jedan dan. bićeš kažnjen (izuću te iz gaća) ${PRAY_EMOTE}`);
     }
 };
 
