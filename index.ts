@@ -21,6 +21,7 @@ const GAMES_FILE = Bun.file('./games.txt');
 
 const GAME_REGEX = /@(.*) ajmo ([a-zA-Z0-9_ ]*)/;
 const EMOJI_REGEX = /((?<!\\)<:[^:]+:(\d+)>)|\p{Emoji_Presentation}|\p{Extended_Pictographic}/gmu;
+const KO_REGEX = /(^| )ko( |$|\?)/;
 
 let textChannel: GuildTextBasedChannel | undefined;
 let voiceChannel: GuildBasedChannel | undefined;
@@ -97,8 +98,9 @@ client.on(Events.MessageCreate, async (message) => {
     const content = message.content.toLowerCase();
 
     // if the message contains an emote, react with it
+    const rnd_emote = Math.random();
     const emotes = content.match(EMOJI_REGEX);
-    if (emotes) {
+    if (emotes && rnd_emote < 0.33) {
         try {
             await message.react(emotes[0]);
         } catch {}
@@ -113,13 +115,17 @@ client.on(Events.MessageCreate, async (message) => {
         message.reply('koliko?');
     } else if (content.includes('ako')) {
         message.reply('**AKO**');
+    } else if (content.includes('kad')) {
+        message.reply('kad?');
+    } else if (KO_REGEX.exec(content)) {
+        message.reply('tvoja mama');
     }
 
     // random chance to reply with a sad/happy emote
-    const rnd = Math.random();
-    if (rnd < 0.01) {
+    const rnd_sad = Math.random();
+    if (rnd_sad < 0.01) {
         message.reply(SAD_EMOTE!);
-    } else if (rnd < 0.011) {
+    } else if (rnd_sad < 0.011) {
         message.reply(HAPPY_EMOTE!);
     }
 
