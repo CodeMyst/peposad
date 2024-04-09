@@ -115,7 +115,7 @@ client.on(Events.MessageCreate, async (message) => {
         message.reply('koliko?');
     } else if (content.includes('ako')) {
         message.reply('**AKO**');
-    } else if (content.includes('kad')) {
+    } else if (content.includes('kad') || content.includes('käd')) {
         message.reply('kad?');
     } else if (KO_REGEX.exec(content)) {
         message.reply('tvoja mama');
